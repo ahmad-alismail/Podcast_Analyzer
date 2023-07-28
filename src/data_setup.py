@@ -55,27 +55,27 @@ def download_audio(link, quality='64'):
     return new_file_path
 
 
-def transcribe_audio(audio_file_path, chunk_length_min=20):
+import uuid
+
+def transcribe_audio(uploaded_file, chunk_length_min=20):
     """
-    Transcribe the audio file at the given path using OpenAI's Whisper ASR system.
+    Transcribe the uploaded audio file using OpenAI's Whisper ASR system.
 
     Args:
-        audio_file_path (str): Path to the audio file to transcribe.
+        uploaded_file (UploadedFile): Uploaded file to transcribe.
         chunk_length_min (float): Length in minutes for each chunk of the audio file. Default is 45 minutes.
 
     Returns:
         str: The file name containing the combined transcription of all chunks of the audio file.
     """
-    if not os.path.isfile(audio_file_path):
-        raise FileNotFoundError(f"No such file: '{audio_file_path}'")
-
-    source = AudioSegment.from_mp3(audio_file_path)
-    whisper_fname = os.path.splitext(os.path.basename(audio_file_path))[0]
+    source = AudioSegment.from_file(uploaded_file, format="mp3")  # read directly from file-like object
+    whisper_fname = str(uuid.uuid4())  # generate a unique filename using uuid
     whisper_transcript_path = f"data/{whisper_fname}.vtt"
-    
+
     if source.duration_seconds < chunk_length_min * 60:
-        with open(audio_file_path, "rb") as audio_file:
-            whisper_output = openai.Audio.transcribe("whisper-1", audio_file, response_format="vtt")
+        # reset the uploaded file's pointer to the beginning
+        uploaded_file.seek(0)
+        whisper_output = openai.Audio.transcribe("whisper-1", uploaded_file, response_format="vtt")
         with open(whisper_transcript_path, "w") as f:
             f.write(whisper_output)
     else:
@@ -83,8 +83,7 @@ def transcribe_audio(audio_file_path, chunk_length_min=20):
         transcriptions = []
         for i, chunk in enumerate(source[::chunk_length]):
             chunk_file_path = f"chunk_{i}.mp3"
-            with open(chunk_file_path, "wb") as chunk_file:
-                chunk.export(chunk_file, format="mp3")
+            chunk.export(chunk_file_path, format="mp3")  # save chunk to a physical file
             with open(chunk_file_path, "rb") as chunk_file:
                 chunk_transcription = openai.Audio.transcribe("whisper-1", chunk_file, response_format="vtt")
                 transcriptions.append(chunk_transcription)
@@ -96,6 +95,8 @@ def transcribe_audio(audio_file_path, chunk_length_min=20):
             f.write(combined_transcription)
 
     return whisper_fname
+
+
 
 
 

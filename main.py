@@ -43,7 +43,7 @@ st.image(image=str(image_path))
 
 # Get audio file
 def get_audio():
-    audio_file = st.file_uploader('Upload a file')
+    audio_file = st.file_uploader('Upload a file', type=["mp3"])
     return audio_file
 
 st.session_state.audio_file = get_audio()
@@ -135,7 +135,7 @@ with st.expander("Question Answering"):
     question = st.text_input(
         "Ask something about the video",
         placeholder="What is the sting theory?",
-        disabled=not enable_custom)
+        disabled= enable_custom)
     if question:
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
         
@@ -146,7 +146,7 @@ with st.expander("Question Answering"):
 
 ## TO-DO correct topics structure
 with st.expander("Summarization and Topic Modelling"):
-    if st.button("Run Summarization"):
+    if st.button("Run Summarization & Extract Topics"):
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
 
         progress_bar = st.progress(0, text="Summarization in progress. Please wait.")
