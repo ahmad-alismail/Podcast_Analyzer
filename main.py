@@ -51,7 +51,7 @@ st.session_state.audio_file = get_audio()
 
 # Get podcast transcript using Whisper 
 if enable_custom:
-    if st.session_state.audio_file is not None:
+    if st.session_state.audio_file is not None and st.button("Transcribe Audio"):
         
         st.info("Processing podcast audio...")
         #audio_file_path = download_audio(podcast_url)
