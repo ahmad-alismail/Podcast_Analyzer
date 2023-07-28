@@ -134,7 +134,8 @@ with st.expander("Named Entity Recognition"):
 with st.expander("Question Answering"):
     question = st.text_input(
         "Ask something about the video",
-        placeholder="What is the sting theory?",)
+        placeholder="What is the sting theory?",
+        disabled=not enable_custom)
     if question:
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
         
