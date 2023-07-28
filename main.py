@@ -41,31 +41,24 @@ st.image(image=str(image_path))
 "st.session_state object:", st.session_state
 # When you press abutton, streamlit reruns your script from top to bottom
 
-# Get podcast URL in video or transcript format
-def get_text():
-    input_text = st.text_input(label="Podcast label", label_visibility='collapsed', placeholder=f"Type Your Video URL...", key="podcast_input")
-    return input_text
+# Get audio file
+def get_audio():
+    audio_file = st.file_uploader('Upload a file', label="Podcast label",)
+    return audio_file
 
-podcast_url = get_text()
+st.session_state.audio_file = get_audio()
 
 
 # Get podcast transcript using Whisper 
 if enable_custom:
-    if podcast_url:
-        if is_valid_url(podcast_url):
-            
-            st.info("Downloading podcast audio...")
-            #audio_file_path = download_audio(podcast_url)
-            if 'audio_file_path' not in st.session_state:
-                st.session_state['audio_file_path'] = download_audio(podcast_url)
-            st.info("Audio downloaded... Transcribing in process...")
-            if 'whisper_fname' not in st.session_state:
-                st.session_state["whisper_fname"] = transcribe_audio(st.session_state.audio_file_path)
-            st.success("Transcription completed!")
+    if st.session_state.audio_file is not None:
+        
+        st.info("Processing podcast audio...")
+        #audio_file_path = download_audio(podcast_url)
+        if 'whisper_fname' not in st.session_state:
+            st.session_state["whisper_fname"] = transcribe_audio(st.session_state.audio_file)
+        st.success("Transcription completed!")
 
-        else:
-            st.error('URL is not valid ❌')
-            st.stop()
 else:
     st.info("No API key provided. Using default podcast audio...\n \
             Or enter your OpenAI API key in the sidebar to use your own podcast audio.")
@@ -73,22 +66,22 @@ else:
 
 # If OpenAI API key is provided, use the custom transcript
 if enable_custom and 'whisper_fname' in st.session_state:
-        TRANSCRIPT_PATH = "./data/"
+        TRANSCRIPT_PATH = script_dir / 'data'
         VTT_FILE_NAME = f"{st.session_state.whisper_fname}.vtt"
         CSV_FILE_NAME = f"{st.session_state.whisper_fname}.csv"
 # Otherwise, use the default transcript
 else:    
-    TRANSCRIPT_PATH = "./data/transcripts/"
+    TRANSCRIPT_PATH = script_dir / 'data' / 'transcripts' # "./data/transcripts/"
     VTT_FILE_NAME = "45_michio_kaku__future_of_humans_aliens_space_travel_and_physics.vtt"
     CSV_FILE_NAME = "45_michio_kaku__future_of_humans_aliens_space_travel_and_physics.csv"
 
 
 # Convert VTT to CSV
-convert_vtt_to_csv(TRANSCRIPT_PATH, VTT_FILE_NAME, CSV_FILE_NAME)
+convert_vtt_to_csv(str(TRANSCRIPT_PATH), VTT_FILE_NAME, CSV_FILE_NAME)
 
 # Read CSV transcript
 def read_csv():
-    df = pd.read_csv(f"{TRANSCRIPT_PATH}/{CSV_FILE_NAME}", sep=";", header=None)
+    df = pd.read_csv(f"{str(TRANSCRIPT_PATH)}/{CSV_FILE_NAME}", sep=";", header=None)
     df.columns = ["timestamp", "text"]
     return df
 
@@ -100,15 +93,15 @@ analysis_transcript_df = reorganize_transcript(inital_transcript_df)
 # Create topic modelling transcript
 topic_modeling_transcript = prepare_transcript_for_modelling(analysis_transcript_df)
 
-# Show podcast video and transcript
-def show_video(url, start_time):
-    return st.video(url, start_time=start_time)
+# # Show podcast video and transcript
+# def show_video(url, start_time):
+#     return st.video(url, start_time=start_time)
 
 with st.expander("Show Transcript"):
     for idx, row in topic_modeling_transcript.iterrows():
-        if st.button(f"{row['timestamp'].split('.')[0]}"):
-            my_video = show_video("https://youtu.be/bUmULlGACEI", # change it to podcast_url
-                                  start_time=timestamp_to_seconds(row['timestamp'])) if podcast_url else None
+        # if st.button(f"{row['timestamp'].split('.')[0]}"):
+        #     my_video = show_video("https://youtu.be/bUmULlGACEI", # change it to podcast_url
+        #                           start_time=timestamp_to_seconds(row['timestamp'])) if podcast_url else None
         st.markdown(f"{row['text']}")
         
 def show_word_cloud(df, named_entity):
@@ -141,8 +134,7 @@ with st.expander("Named Entity Recognition"):
 with st.expander("Question Answering"):
     question = st.text_input(
         "Ask something about the video",
-        placeholder="What is the sting theory?",
-        disabled=not is_valid_url(podcast_url),)
+        placeholder="What is the sting theory?",)
     if question:
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
         
@@ -153,7 +145,7 @@ with st.expander("Question Answering"):
 
 ## TO-DO correct topics structure
 with st.expander("Summarization and Topic Modelling"):
-    if st.button("Run Summarization") and is_valid_url(podcast_url):
+    if st.button("Run Summarization"):
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
 
         progress_bar = st.progress(0, text="Summarization in progress. Please wait.")
