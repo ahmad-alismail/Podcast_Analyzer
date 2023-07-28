@@ -43,7 +43,7 @@ st.image(image=str(image_path))
 
 # Get audio file
 def get_audio():
-    audio_file = st.file_uploader('Upload a file', label="Podcast label",)
+    audio_file = st.file_uploader('Upload a file')
     return audio_file
 
 st.session_state.audio_file = get_audio()
