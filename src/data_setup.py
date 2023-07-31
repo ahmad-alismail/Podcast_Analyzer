@@ -55,7 +55,7 @@ def download_audio(link, quality='64'):
     return new_file_path
 
 
-def transcribe_audio(audio_file_path, chunk_length_min=20):
+def transcribe_audio(audio_file_path, user_openai_key, chunk_length_min=20):
     """
     Transcribe the audio file at the given path using OpenAI's Whisper ASR system.
 
@@ -68,6 +68,7 @@ def transcribe_audio(audio_file_path, chunk_length_min=20):
     """
     if not os.path.isfile(audio_file_path):
         raise FileNotFoundError(f"No such file: '{audio_file_path}'")
+    openai.api_key = user_openai_key
 
     source = AudioSegment.from_mp3(audio_file_path)
     whisper_fname = os.path.splitext(os.path.basename(audio_file_path))[0]
