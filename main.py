@@ -147,7 +147,7 @@ with st.expander("Question Answering"):
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
         
         # Initialize QA chain
-        qa_chain = load_qa(file="data/topic_modeling_transcript.csv")
+        qa_chain = load_qa(file="data/topic_modeling_transcript.csv", openai_key=user_openai_api_key)
         result = qa_chain({"question": question})
         st.markdown(result["answer"])
 
@@ -157,14 +157,14 @@ with st.expander("Summarization and Topic Modelling"):
         topic_modeling_transcript.to_csv("data/topic_modeling_transcript.csv", index=False)
 
         progress_bar = st.progress(0, text="Summarization in progress. Please wait.")
-        summary = run_summarizer(file="data/topic_modeling_transcript.csv")
+        summary = run_summarizer(file="data/topic_modeling_transcript.csv", openai_key=user_openai_api_key)
         progress_bar.empty()  # optional: you may want to remove the progress bar here
         st.markdown("## Summary")
         st.write(summary)
         progress_bar = st.progress(0, text="Extracting topics. Please wait.")
-        summary_structured = run_extraction_chain(summary)
+        summary_structured = run_extraction_chain(summary, openai_key=user_openai_api_key)
         st.markdown("## Topics")
-        topics = extract_topics(summary_structured)
+        topics = extract_topics(summary_structured, openai_key=user_openai_api_key)
         st.dataframe(topics)
         st.success('Done!')
 

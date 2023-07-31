@@ -1,4 +1,5 @@
 import spacy
+import openai
 import textacy
 from typing import List, Optional, Union, Callable
 from spacy.tokens import Doc
@@ -166,7 +167,7 @@ def generate_word_cloud(data: pd.DataFrame,
     return fig
 
 
-def load_qa(file, chain_type="stuff", k=5):
+def load_qa(file, openai_key, chain_type="stuff", k=5):
     """
     Create a QuestionAnswering chain with memory
 
@@ -175,7 +176,7 @@ def load_qa(file, chain_type="stuff", k=5):
     :param max_words: The maximum number of words in the word cloud.
     :return: A matplotlib Figure object containing the word cloud or a blank plot if no words were found.
     """
-        
+    openai.api_key = openai_key    
     # load documents
     loader = CSVLoader(file_path=file,  encoding='utf-8')
     documents = loader.load()
@@ -201,10 +202,11 @@ def load_qa(file, chain_type="stuff", k=5):
     )
     return qa
 
-def run_summarizer(file, chain_type="map_reduce", model_name="gpt-3.5-turbo-0613"):
+def run_summarizer(file, openai_key, chain_type="map_reduce", model_name="gpt-3.5-turbo-0613"):
     """
     Create a summarizer chain
     """
+    openai.api_key = openai_key
     # load documents
     with open(file) as f:
         full_text = f.read()
@@ -247,10 +249,11 @@ def run_summarizer(file, chain_type="map_reduce", model_name="gpt-3.5-turbo-0613
     return episode_summary
 
 
-def run_extraction_chain(episode_summary, model_name="gpt-3.5-turbo-0613"):
+def run_extraction_chain(episode_summary, openai_key, model_name="gpt-3.5-turbo-0613"):
     """
     Run extraction chain that extracts structured data from the summary
     """
+    openai.api_key = openai_key
 
     # schema defines the properties you want to find and the expected types and description for those properties. 
     schema = {
@@ -275,11 +278,11 @@ def run_extraction_chain(episode_summary, model_name="gpt-3.5-turbo-0613"):
 
     return summary_structured
 
-def extract_topics(summary_structured, model_name="gpt-3.5-turbo-0613"):
+def extract_topics(summary_structured, openai_key ,model_name="gpt-3.5-turbo-0613"):
     """
     Extract topics from the structured summary
     """
-
+    openai.api_key = openai_key
     system_template = """
     You are a helpful assistant that helps retrieve topics talked about in a short text
     - You will be given a text
