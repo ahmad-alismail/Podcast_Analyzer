@@ -39,7 +39,7 @@ image_path = script_dir / 'imgs' / 'podcast_analyzer.PNG'
 # Use the image path in st.image
 st.image(image=str(image_path))
 
-"st.session_state object:", st.session_state
+#"st.session_state object:", st.session_state
 
 # Get podcast URL in video or transcript format
 def get_text():
