@@ -184,7 +184,7 @@ def load_qa(file, openai_key, chain_type="stuff", k=5):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
     docs = text_splitter.split_documents(documents)
     # define embedding
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_key)
     # create vector database from data to use as index
     db = DocArrayInMemorySearch.from_documents(docs,
                                                 embeddings)
