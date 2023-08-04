@@ -195,7 +195,7 @@ def load_qa(file, openai_key, chain_type="stuff", k=5):
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": k})
     # create a chatbot chain. Memory is managed internally.
     qa = ConversationalRetrievalChain.from_llm(
-        llm=ChatOpenAI(temperature = 0.0, model_name='gpt-3.5-turbo-0613'), 
+        llm=ChatOpenAI(temperature = 0.0, openai_api_key=openai_key ,model_name='gpt-3.5-turbo-0613'), 
         chain_type=chain_type, 
         retriever=retriever, 
         memory=memory
@@ -239,7 +239,7 @@ def run_summarizer(file, openai_key, chain_type="map_reduce", model_name="gpt-3.
     """
     combine_prompt_template = PromptTemplate.from_template(combine_prompt) # infer input variables automatically
     
-    summary_chain = load_summarize_chain(llm=ChatOpenAI(temperature = 0.0, model_name=model_name),
+    summary_chain = load_summarize_chain(llm=ChatOpenAI(temperature = 0.0, openai_api_key=openai_key,model_name=model_name),
                                      chain_type=chain_type,
                                      map_prompt=map_prompt_template,
                                      combine_prompt=combine_prompt_template,
@@ -273,7 +273,7 @@ def run_extraction_chain(episode_summary, openai_key, model_name="gpt-3.5-turbo-
     }
     # Using gpt3.5 here because this is an easy extraction task and no need to jump to gpt4
     extraction_chain = create_extraction_chain(schema, 
-                                               llm=ChatOpenAI(temperature = 0.0, model_name=model_name))
+                                               llm=ChatOpenAI(temperature = 0.0, openai_api_key=openai_key,model_name=model_name))
     summary_structured = extraction_chain.run(episode_summary)
 
     return summary_structured
@@ -299,7 +299,7 @@ def extract_topics(summary_structured, openai_key ,model_name="gpt-3.5-turbo-061
         human_message_prompt,
     ]
     topic_prompt = ChatPromptTemplate.from_messages(messages)
-    topic_chain = LLMChain(llm=ChatOpenAI(temperature = 0.0, model_name=model_name),
+    topic_chain = LLMChain(llm=ChatOpenAI(temperature = 0.0, openai_api_key=openai_key, model_name=model_name),
                            prompt=topic_prompt, 
                            verbose=False)
     
