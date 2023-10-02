@@ -40,6 +40,9 @@ streamlit run main.py
 
 In the app, you can input your OpenAI API key in the sidebar. If you don't have an OpenAI API key, the app will use a default video for analysis.
 
+## To-do
+* Implement Caching to improve the app performance
+
 ## Contribution
 
 Feel free to fork this repository, create a branch, add commits, and open a pull request.
