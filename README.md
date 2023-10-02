@@ -1,6 +1,6 @@
 # Podcast Analyzer
 
-Podcast Analyzer is a tool built with Streamlit, Whisper, LangChain to analyze the content of podcasts. 
+Podcast Analyzer is a tool built with Streamlit, Whisper, LangChain to analyze the content of videos. 
 
 You can access a live demo of the app [here](https://podcastanalysis.streamlit.app/).
 
